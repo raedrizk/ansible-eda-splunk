@@ -9,18 +9,14 @@
   rules:
       ## Checking for Organization modification Alert
     - name: AAP Organization Modified
-      #condition: event.app == 'ansible_addon_for_splunk' and event.results.message == 'Activity Stream update entry for organization'
-      condition: event.meta is defined
+      condition: event.payload.app == 'ansible_addon_for_splunk' and event.payload.results.message == 'Activity Stream update entry for organization'
+      # Modify the RBAC role for the organization
       action:
-        print_event:
-          pretty: true
-      ## Modify the RBAC role for the organization
-      # action:
-      #   run_job_template:
-      #     name: EDADemo-action-splunk-modify-team-role
-      #     organization: "{{ job_templates_org_name | default('Foxhound') }}"
-      #     job_args:
-      #       extra_vars:
-      #         org_operation: "{{ event.results.operation }}"
-      #         org_name: "{{ event.results.summary_fields.organization{}.id }}"
-      #         org_id: "{{ event.results.summary_fields.organization{}.name }}"
+        run_job_template:
+          name: EDADemo-action-splunk-modify-team-role
+          organization: "{{ job_templates_org_name | default('Foxhound') }}"
+          job_args:
+            extra_vars:
+              org_operation: "{{ event.payload.results.operation }}"
+              org_name: "{{ event.payload.results.summary_fields.organization{}.id }}"
+              org_id: "{{ event.payload.results.summary_fields.organization{}.name }}"
