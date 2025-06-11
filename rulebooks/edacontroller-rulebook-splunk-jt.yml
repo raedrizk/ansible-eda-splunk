@@ -18,5 +18,5 @@
           job_args:
             extra_vars:
               org_operation: "{{ event.payload.results.operation }}"
-              org_name: "{{ event.payload.results.summary_fields.organization'{}'.id }}"
-              org_id: "{{ event.payload.results.summary_fields.organization'{}'.name }}"
+              org_name: "{{ event.payload.results.changes.id }}"
+              org_id: "{{ event.payload.results.changes.name }}"
