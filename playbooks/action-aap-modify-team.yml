@@ -28,6 +28,6 @@
       loop:
         - Organization Execute
         - Organization Audit
-      when: org_operation in ['create', 'update']
+      when: org_operation in ['create', 'delete']
 
 
