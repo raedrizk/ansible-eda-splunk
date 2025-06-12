@@ -24,7 +24,7 @@
         role_definition: "{{ item }}"
         object_id: "{{ org_id }}"
         team: "{{ input_team_name | default('global-support') }}"
-        state: "{{ 'present' when org_operation is defined and org_operation == 'create' else 'absent' }}"
+        state: "{{ 'present' if (org_operation is defined and org_operation == 'create') else 'absent' }}"
       loop:
         - 'Organization Execute'
         - 'Organization Audit'
