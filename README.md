@@ -23,6 +23,7 @@ on the EDA side, we will need to create an event stream for the alerts recieved 
 ![Event Stream Token](_images/aap1.png)
 
 4. Under `Automation Decisions`, click on `Event Streams`, and click on `Create Event Stream`
+
 5. Enter all the details for the new Event Stream, make sure to select `Token Event Stream` for the event stream type, and select the credential you created earlier for the `Credential` field, then Click on `Create event stream`.
 
 ![Event Stream](_images/aap2.png)
@@ -31,4 +32,16 @@ on the EDA side, we will need to create an event stream for the alerts recieved 
 
 ![Event Stream](_images/aap3.png)
 
+7. Under `Automation Decisions`, click on `Projects`, and Create a new project to point to the git repo containing your rulebook.
 
+8. Under `Automation Decisions`, click on `Rulebook Activations`, and click on `Create rulebook Activation`. ENter the details of the new Activation, and click on the gear icon in the `Event stremas` field to map the Event stream created earlier to the source in the rulebook.
+
+![Rulebook Activation](_images/aap4.png)
+
+9. Choose the Event stream name created earlier, and make sure that it maps to the correct source in the rulebook. Since we only have one source it will automatically be selected (the preview should help with the verification). Click on `save`.
+
+![Event Stream Mapping](_images/aap5.png)
+
+10. Click on `Create rulebook activation` - The rulebook activation should now start, and will eventually be in the running state.
+
+![Event Stream Mapping](_images/aap6.png)
