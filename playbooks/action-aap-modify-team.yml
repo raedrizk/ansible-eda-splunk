@@ -22,7 +22,7 @@
     - name: Give Global Support Team Org Audit and Org Execute on all organizations
       ansible.controller.role_team_assignment:
         role_definition: "{{ item }}"
-        object_id: 65
+        object_id: "{{ org_id }}"
         team: "{{ input_team_name | default('global-support') }}"
         state: "{{ 'present' when org_operation == 'create' else 'absent' }}"
       loop:
