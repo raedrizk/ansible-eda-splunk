@@ -2,6 +2,22 @@
 - name: Modify the team role in AAP to include all organization permissions
   hosts: all
   gather_facts: false
+  environment:
+    GATEWAY_USERNAME: "{{ lookup('ansible.builtin.env', 'CONTROLLER_USERNAME') }}"
+    GATEWAY_PASSWORD: "{{ lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD') }}"
+    GATEWAY_HOSTNAME: "{{ lookup('ansible.builtin.env', 'CONTROLLER_HOST') }}"
+    GATEWAY_VERIFY_SSL: "{{ lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL') }}"
+  pre_tasks:
+    - name: Authenticate with platform gateway
+      ansible.platform.token:
+        description: Create token
+        scope: write
+        state: present
+      register: r_authtoken
+
+    - name: Set fact for token
+      ansible.builtin.set_fact:
+        controller_oauthtoken: “{{ r_authtoken.ansible_facts.aap_token.token }}”
   tasks:
     - name: Give Global Support Team Org Audit and Org Execute on all organizations
       ansible.controller.role_team_assignment:
