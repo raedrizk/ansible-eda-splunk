@@ -11,14 +11,16 @@
     - name: AAP Organization Modified
       condition: event.payload.app == 'ansible_addon_for_splunk' and event.payload.results.message == 'Activity Stream update entry for organization'
       # Modify the RBAC role for the organization
-      action:
-        debug:
-          msg: "{{ event.payload.results['operation'] }} an organization by the name of {{ event.payload.results['changes.name'] }} and id of {{ event.payload.results['changes.id'] }}"
-        # run_job_template:
-        #   name: EDADemo-action-splunk-modify-team-role
-        #   organization: "{{ job_templates_org_name | default('Foxhound') }}"
-        #   job_args:
-        #     extra_vars:
-        #       org_operation: "{{ event.payload.results['operation'] }}"
-        #       org_name: "{{ event.payload.results['changes.id'] }}"
-        #       org_id: "{{ event.payload.results.['changes.name'] }}"
+      actions:
+        - debug:
+            msg: "{{ event.payload.results['operation'] }} an organization by the
+                   name of {{ event.payload.results['changes.name'] }} and id
+                   of {{ event.payload.results['changes.id'] }}"
+        - run_job_template:
+            name: EDADemo-action-splunk-modify-team-role
+            organization: "{{ job_templates_org_name | default('Foxhound') }}"
+            job_args:
+              extra_vars:
+                org_operation: "{{ event.payload.results['operation'] }}"
+                org_name: "{{ event.payload.results['changes.id'] }}"
+                org_id: "{{ event.payload.results.['changes.name'] }}"
