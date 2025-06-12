@@ -13,10 +13,7 @@
       # Modify the RBAC role for the organization
       action:
         debug:
-          msg:
-            - "operation is :{{ event.payload.results['operation'] }}"
-            - "or namew is  :{{ event.payload.results['changes.name'] }}"
-            - "or id is  :{{ event.payload.results['changes.id'] }}"
+          msg: "{{ event.payload.results['operation'] }} an organization by the name of {{ event.payload.results['changes.name'] }} and id of {{ event.payload.results['changes.id'] }}"
         # run_job_template:
         #   name: EDADemo-action-splunk-modify-team-role
         #   organization: "{{ job_templates_org_name | default('Foxhound') }}"
