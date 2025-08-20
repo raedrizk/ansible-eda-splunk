@@ -9,7 +9,7 @@
   rules:
       ## Checking for Organization modification Alert
     - name: AAP Organization Modified
-      condition: event.payload.app == 'ansible_addon_for_splunk' and event.payload.results.message == 'Activity Stream update entry for organization'
+      condition: event.payload.results.index == 'aap' and event.payload.results.message == 'Activity Stream update entry for organization'
       # Modify the RBAC role for the organization
       actions:
         - debug:
