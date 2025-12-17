@@ -30,5 +30,5 @@
       loop:
         - 'Organization Execute'
         - 'Organization Audit'
-      when: org_operation is defined and org_operation in ['create', 'delete']
+      when: org_operation is defined and org_operation in ['create']
 
