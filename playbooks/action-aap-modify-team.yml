@@ -20,7 +20,7 @@
         controller_oauthtoken: “{{ r_authtoken.ansible_facts.aap_token.token }}”
   tasks:
     - name: Give Global Support Team Org Audit and Org Execute on all organizations
-      ansible.controller.role_team_assignment:
+      ansible.platform.role_team_assignment:
         role_definition: "{{ item }}"
         object_id: "{{ org_id | int }}"
         team: "{{ input_team_name | default('global-support') }}"
