@@ -37,7 +37,6 @@
             job_args:
               limit: "{{ event.payload.results['host'] }}"
               extra_vars:
-                reported_saturation_problem_type: "{{ event.title }}"
                 reporting_host: "{{ event.payload.results['host'] }}"
                 snow_inc_short_desc: "SSH Bruteforce attck detected on: {{ event.payload.results['host'] }}"
                 snow_inc_desc: "An SSH Bruteforce attack was detected on Reported on {{ event.payload.results['host'] }} coming from source IP {{ event.payload.results['src_ip'] }} with user {{ event.payload.results['user'] }}."
