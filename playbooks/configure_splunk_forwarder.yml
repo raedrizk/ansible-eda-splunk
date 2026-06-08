@@ -1,0 +1,141 @@
+---
+- name: Install and Configure Splunk Universal Forwarder for SSH Monitoring
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    # Splunk version and download
+    splunk_version: "9.4.7"
+    splunk_release_id: "2a9293b80994"
+      
+    # Deployment server configuration
+    splunk_indexer_host: "{{ splunk_indexer_host_input }}"
+    splunk_indexer_port: "{{ splunk_indexer_port_input }}"
+    
+    # Admin credentials
+    splunk_admin_user: "{{ splunk_admin_user_input }}"
+    splunk_admin_password: "{{ splunk_admin_password_input }}"
+    
+    # Installation paths
+    splunk_home: "/opt/splunkforwarder"
+    
+    # Inputs to monitor
+    splunk_sourcetype: "linux_secure"
+    splunk_index: "linux"
+    
+  tasks:
+    # ==========================================
+    # INSTALL SPLUNK UNIVERSAL FORWARDER
+    # ==========================================
+    - name: Install Splunk Universal Forwarder
+      splunk.enterprise.splunk_universal_forwarder_linux:
+        state: present
+        version: "{{ splunk_version }}"
+        release_id: "{{ splunk_release_id }}"
+        username: "{{ splunk_admin_user }}"
+        password: "{{ splunk_admin_password }}"
+        forward_servers:
+        - "{{ splunk_indexer_host }}:{{ splunk_indexer_port }}"
+        
+    - name: Start Splunk Universal Forwarder
+      ansible.builtin.command:
+        cmd: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes --no-prompt -auth {{ splunk_admin_user }}:{{ splunk_admin_password }}"
+      become: true
+      ignore_errors: true  # Ignore if already started  
+
+    # ==========================================
+    # CONFIGURE MONITOR
+    # ==========================================
+    
+    - name: Add linux secure monitor                                                                                                                                                                                                                            
+      ansible.builtin.command:                                                                                                                                                                                                                                                 
+        cmd: "{{ splunk_home }}/bin/splunk add monitor /var/log/secure -index {{ splunk_index }} -sourcetype {{ splunk_sourcetype }} -auth {{ splunk_admin_user }}:{{ splunk_admin_password }}"
+      become: true
+      ignore_errors: true  # Ignore if input already exists
+
+    # ==========================================
+    # SET FILE PERMISSIONS FOR LOG ACCESS
+    # ==========================================
+
+    - name: Install ACL package
+      ansible.builtin.dnf:
+        name: acl
+        state: present
+
+    - name: Set ACL for splunk user to read /var/log/secure
+      ansible.posix.acl:
+        path: /var/log/secure
+        entity: splunkfwd
+        etype: user
+        permissions: r
+        state: present
+
+    - name: Set ACL for splunk user to read /var/log/audit/audit.log
+      ansible.posix.acl:
+        path: /var/log/audit/audit.log
+        entity: splunkfwd
+        etype: user
+        permissions: r
+        state: present
+      ignore_errors: true  # In case audit log doesn't exist
+
+    # ==========================================
+    # CONFIGURE FIREWALL
+    # ==========================================
+
+    - name: Check if firewalld is running
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_status
+
+    - name: Allow outbound connection to Splunk server
+      ansible.posix.firewalld:
+        rich_rule: 'rule family="ipv4" destination address="{{ splunk_indexer_host }}" port protocol="tcp" port="{{ splunk_indexer_port }}" accept'
+        permanent: true
+        state: enabled
+        immediate: true
+      when: firewalld_status.status.ActiveState == "active"
+      ignore_errors: true  # In case DNS doesn't resolve
+
+    # ==========================================
+    # RESTART SPLUNK UNIVERSAL FORWARDER  
+    # ==========================================
+    - name: Restart Splunk Universal Forwarder
+      ansible.builtin.command:
+        cmd: "{{ splunk_home }}/bin/splunk restart"
+      become: true
+      ignore_errors: true  # Ignore if already started  
+
+    # ==========================================
+    # DEBUG
+    # ==========================================
+
+    - name: Wait for Splunk to be fully started
+      ansible.builtin.wait_for:
+        path: "{{ splunk_home }}/var/run/splunk/splunkd.pid"
+        state: present
+        timeout: 60
+
+    - name: Gather Splunk Universal Forwarder information
+      splunk.enterprise.splunk_universal_forwarder_linux_info:
+        username: "{{ splunk_admin_user }}"
+        password: "{{ splunk_admin_password }}"
+      register: splunk_info
+
+    - name: Display Splunk Universal Forwarder status
+      ansible.builtin.debug:
+        msg:
+          - "Splunk Version: {{ splunk_info.version | default('N/A') }}"
+          - "Splunk Home: {{ splunk_info.splunk_home | default('N/A') }}"
+          - "Forward Servers: {{ splunk_info.forward_servers | default([]) }}"
+
+    - name: Verify forwarder is configured correctly
+      ansible.builtin.assert:
+        that:
+          - splunk_info.splunk_home == splunk_home
+        success_msg: "Splunk Universal Forwarder is installed and running"
+        fail_msg: "Splunk Universal Forwarder verification failed"
+
+
+  

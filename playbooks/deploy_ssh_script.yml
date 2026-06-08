@@ -1,0 +1,63 @@
+---
+- name: Deploy ssh script to RHEL hosts
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Copy SSH monitoring script to remote hosts
+      ansible.builtin.copy:
+        dest: ~/ssh_bruteforce.sh
+        mode: "a+x"
+        content: |
+          #!/bin/bash
+          #
+          # ssh_test.sh - Generate failed SSH login attempts for testing
+          #
+          # Usage: ./ssh_test.sh <username>
+          # Example: ./ssh_test.sh baduser
+          #
+
+          # Check if username argument is provided
+          if [ -z "$1" ]; then
+              echo "Error: Username argument required"
+              echo "Usage: $0 <username>"
+              echo "Example: $0 baduser"
+              exit 1
+          fi
+
+          USERNAME="$1"
+          ATTEMPTS=15
+          HOST="127.0.0.1"
+
+          echo "==============================================="
+          echo "SSH Brute Force Test Script"
+          echo "==============================================="
+          echo "Target: ${USERNAME}@${HOST}"
+          echo "Attempts: ${ATTEMPTS}"
+          echo "Delay: 1 second between attempts"
+          echo "==============================================="
+          echo ""
+
+          for i in $(seq 1 $ATTEMPTS); do
+              echo "[Attempt $i/$ATTEMPTS] Trying SSH connection as ${USERNAME}@${HOST}..."
+
+              # Attempt SSH connection (will fail without valid credentials)
+              # -o StrictHostKeyChecking=no : Skip host key checking
+              # -o ConnectTimeout=5 : Timeout after 5 seconds
+              # -o BatchMode=yes : Disable interactive prompts
+              ssh -o StrictHostKeyChecking=no \
+                  -o ConnectTimeout=5 \
+                  -o BatchMode=yes \
+                  ${USERNAME}@${HOST} "echo test" 2>/dev/null
+
+              # Check if this is not the last attempt before sleeping
+              if [ $i -lt $ATTEMPTS ]; then
+                  sleep 1
+              fi
+          done
+
+          echo ""
+          echo "==============================================="
+          echo "Test completed: ${ATTEMPTS} SSH attempts made"
+          echo "Check /var/log/secure for failed login entries"
+          echo "==============================================="

@@ -24,3 +24,18 @@
                 org_operation: "{{ event['payload']['results']['operation'] }}"
                 org_name: "{{ event['payload']['results']['changes.name'] }}"
                 org_id: "{{ event['payload']['results']['changes.id'] }}"
+
+    - name: SSH Bruteforce Attack Detected
+      condition: event.payload.search_name is defined and event.payload.search_name == 'ssh_bruteforce_eda' 
+      # Modify the RBAC role for the organization
+      actions:
+        - debug:
+            msg: "{{ event.payload.results['host'] }}:{{ event.payload.results['user'] }}@{{ event.payload.results['src_ip'] }}"
+        # - run_job_template:
+        #     name: EDADemo-action-splunk-modify-team-role
+        #     organization: "{{ job_templates_org_name | default('Foxhound') }}"
+        #     job_args:
+        #       extra_vars:
+        #         org_operation: "{{ event['payload']['results']['operation'] }}"
+        #         org_name: "{{ event['payload']['results']['changes.name'] }}"
+        #         org_id: "{{ event['payload']['results']['changes.id'] }}"

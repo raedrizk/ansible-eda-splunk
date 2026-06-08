@@ -1,2 +1,4 @@
 .ansible
 .vscode
+inventory.yml
+ansible-navigator*

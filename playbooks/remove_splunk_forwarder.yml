@@ -1,0 +1,39 @@
+---
+- name: Install and Configure Splunk Universal Forwarder for SSH Monitoring
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    # Splunk version and download
+    splunk_version: "9.4.7"
+    splunk_release_id: "2a9293b80994"
+      
+    # Deployment server configuration
+    splunk_indexer_host: "{{ splunk_indexer_host_input }}"
+    splunk_indexer_port: "{{ splunk_indexer_port_input }}"
+    
+    # Admin credentials
+    splunk_admin_user: "{{ splunk_admin_user_input }}"
+    splunk_admin_password: "{{ splunk_admin_password_input }}"
+    
+    # Installation paths
+    splunk_home: "/opt/splunkforwarder"
+    
+    # Inputs to monitor
+    splunk_sourcetype: "linux_secure"
+    splunk_index: "linux"
+    
+  tasks:
+    # ==========================================
+    # UNINSTALL SPLUNK UNIVERSAL FORWARDER
+    # ==========================================
+    - name: Uninstall Splunk Universal Forwarder
+      splunk.enterprise.splunk_universal_forwarder_linux:
+        state: absent
+        version: "{{ splunk_version }}"
+        release_id: "{{ splunk_release_id }}"
+        username: "{{ splunk_admin_user }}"
+        password: "{{ splunk_admin_password }}"
+        forward_servers:
+        - "{{ splunk_indexer_host }}:{{ splunk_indexer_port }}"
