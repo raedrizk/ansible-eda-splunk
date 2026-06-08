@@ -26,11 +26,11 @@
                 org_id: "{{ event['payload']['results']['changes.id'] }}"
 
     - name: SSH Bruteforce Attack Detected
-      condition: event.payload.search_name is defined and event.payload.search_name == 'ssh_bruteforce_eda' 
+      condition: event.payload.search_name is defined and event.payload.search_name == 'ssh_bruteforce_eda'
       # Modify the RBAC role for the organization
       actions:
         - debug:
-            msg: "{{ event.payload.results['host'] }}:{{ event.payload.results['user'] }}@{{ event.payload.results['src_ip'] }}":
+            msg: "{{ event.payload.results['host'] }}:{{ event.payload.results['user'] }}@{{ event.payload.results['src_ip'] }}"
         - run_workflow_template:
             name: WF_EDA_Action_Splunk_report_and_isolate_host
             organization: "{{ job_templates_org_name | default('Foxhound') }}"
@@ -40,12 +40,14 @@
                 reported_saturation_problem_type: "{{ event.title }}"
                 reporting_host: "{{ event.payload.results['host'] }}"
                 snow_inc_short_desc: "SSH Bruteforce attck detected on: {{ event.payload.results['host'] }}"
-                snow_inc_desc: "An SSH Bruteforce attack was detected on Reported on {{ event.payload.results['host'] }} coming from source IP {{ event.payload.results['src_ip'] }} with user {{ event.payload.results['user'] }}. Please investigate the issue and take necessary actions to mitigate the attack."
+                snow_inc_desc: "An SSH Bruteforce attack was detected on Reported on {{ event.payload.results['host'] }}
+                                coming from source IP {{ event.payload.results['src_ip'] }} with user {{ event.payload.results['user'] }}.
+                                Please investigate the issue and take necessary actions to mitigate the attack."
                 snow_inc_urgency: "{{ snow_inc_urgency_choice | default('medium') }}"
                 snow_inc_impact: "{{ snow_inc_impact_choice | default('medium') }}"
 
     - name: Catchall
-      condition: event.payload is defined 
+      condition: event.payload is defined
       # Modify the RBAC role for the organization
       actions:
         - debug:
