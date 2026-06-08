@@ -39,3 +39,11 @@
         #         org_operation: "{{ event['payload']['results']['operation'] }}"
         #         org_name: "{{ event['payload']['results']['changes.name'] }}"
         #         org_id: "{{ event['payload']['results']['changes.id'] }}"
+
+
+    - name: Catchall
+      condition: event.payload is defined 
+      # Modify the RBAC role for the organization
+      actions:
+        - debug:
+            msg: "{{ event }}"
