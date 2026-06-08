@@ -40,9 +40,7 @@
                 reported_saturation_problem_type: "{{ event.title }}"
                 reporting_host: "{{ event.payload.results['host'] }}"
                 snow_inc_short_desc: "SSH Bruteforce attck detected on: {{ event.payload.results['host'] }}"
-                snow_inc_desc: "An SSH Bruteforce attack was detected on Reported on {{ event.payload.results['host'] }}
-                                coming from source IP {{ event.payload.results['src_ip'] }} with user {{ event.payload.results['user'] }}.
-                                Please investigate the issue and take necessary actions to mitigate the attack."
+                snow_inc_desc: "An SSH Bruteforce attack was detected on Reported on {{ event.payload.results['host'] }} coming from source IP {{ event.payload.results['src_ip'] }} with user {{ event.payload.results['user'] }}."
                 snow_inc_urgency: "{{ snow_inc_urgency_choice | default('medium') }}"
                 snow_inc_impact: "{{ snow_inc_impact_choice | default('medium') }}"
 
