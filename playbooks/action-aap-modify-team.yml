@@ -6,9 +6,9 @@
   tasks:
     - name: Give Global Support Team Org Audit and Org Execute on all organizations
       ansible.platform.role_team_assignment:
-        aap_hostname: "{{ aap_hostname | default(lookup('ansible.builtin.env', 'GATEWAY_HOSTNAME')) }}"
-        aap_username: "{{ aap_username | default(lookup('ansible.builtin.env', 'GATEWAY_USERNAME')) }}"
-        aap_password: "{{ aap_password | default(lookup('ansible.builtin.env', 'GATEWAY_PASSWORD')) }}"
+        aap_hostname: "{{ aap_hostname }}"
+        aap_username: "{{ aap_username }}"
+        aap_password: "{{ aap_password }}"
         role_definition: "{{ item }}"
         assignment_objects:
         - name: "{{ org_name }}"
