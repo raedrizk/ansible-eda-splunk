@@ -2,9 +2,13 @@
 - name: Modify the team role in AAP to include all organization permissions
   hosts: all
   gather_facts: false
+
   tasks:
     - name: Give Global Support Team Org Audit and Org Execute on all organizations
       ansible.platform.role_team_assignment:
+        aap_hostname: "{{ aap_hostname | default(lookup('ansible.builtin.env', 'GATEWAY_HOSTNAME')) }}"
+        aap_username: "{{ aap_username | default(lookup('ansible.builtin.env', 'GATEWAY_USERNAME')) }}"
+        aap_password: "{{ aap_password | default(lookup('ansible.builtin.env', 'GATEWAY_PASSWORD')) }}"
         role_definition: "{{ item }}"
         assignment_objects:
         - name: "{{ org_name }}"
@@ -15,3 +19,4 @@
         - 'Organization Execute'
         - 'Organization Audit'
       when: org_operation is defined and org_operation in ['create']
+      no_log: true
